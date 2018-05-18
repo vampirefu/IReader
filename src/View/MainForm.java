@@ -1,6 +1,13 @@
 package View;
 
-import java.awt.BorderLayout;
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class MainForm extends JFrame {
 
@@ -33,7 +40,7 @@ public class MainForm extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		//书籍管理按钮
+		//涔︾睄绠＄悊鎸夐挳
 		JButton btn_Book = new JButton("\u4E66\u7C4D\u7BA1\u7406");
 		btn_Book.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -43,7 +50,7 @@ public class MainForm extends JFrame {
 		});
 		btn_Book.setBounds(23, 24, 93, 23);
 		contentPane.add(btn_Book);
-		//阅读管理功能
+		//闃呰绠＄悊鍔熻兘
 		JButton btn_Read = new JButton("\u9605\u8BFB\u7BA1\u7406");
 		btn_Read.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -54,7 +61,7 @@ public class MainForm extends JFrame {
 		});
 		btn_Read.setBounds(23, 79, 93, 23);
 		contentPane.add(btn_Read);
-		//设置按钮
+		//璁剧疆鎸夐挳
 		JButton btn_Set = new JButton("\u8BBE\u7F6E");
 		btn_Set.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
