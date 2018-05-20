@@ -33,12 +33,16 @@ public class SettingForm extends JFrame {
 	 * Create the frame.
 	 */
 	public SettingForm() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 297, 220);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		Toolkit tool = Toolkit.getDefaultToolkit();
+		Dimension screen = tool.getScreenSize();
+		setLocation(screen.width / 2 - this.getWidth() / 2,
+				screen.height / 2 - this.getHeight() / 2);
 		//连续阅读模式
 		final JCheckBox ckb_Continue = new JCheckBox("\u8FDE\u7EED\u9605\u8BFB\u6A21\u5F0F");
 		ckb_Continue.setBounds(39, 18, 103, 23);

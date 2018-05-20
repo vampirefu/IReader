@@ -1,11 +1,16 @@
 package View;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JButton;
+
+import util.UserDao;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -35,11 +40,15 @@ public class MainForm extends JFrame {
 	 */
 	public MainForm() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 162, 222);
+		setBounds(100, 100, 213, 221);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		Toolkit tool = Toolkit.getDefaultToolkit();
+		Dimension screen = tool.getScreenSize();
+		setLocation(screen.width / 2 - this.getWidth() / 2,
+				screen.height / 2 - this.getHeight() / 2);
 		//书籍管理按钮
 		JButton btn_Book = new JButton("\u4E66\u7C4D\u7BA1\u7406");
 		btn_Book.addActionListener(new ActionListener() {
@@ -48,7 +57,7 @@ public class MainForm extends JFrame {
 				bmForm.setVisible(true);
 			}
 		});
-		btn_Book.setBounds(23, 24, 93, 23);
+		btn_Book.setBounds(38, 23, 93, 23);
 		contentPane.add(btn_Book);
 		//阅读管理功能
 		JButton btn_Read = new JButton("\u9605\u8BFB\u7BA1\u7406");
@@ -59,7 +68,7 @@ public class MainForm extends JFrame {
 				rdForm.setVisible(true);
 			}
 		});
-		btn_Read.setBounds(23, 79, 93, 23);
+		btn_Read.setBounds(38, 74, 93, 23);
 		contentPane.add(btn_Read);
 		//设置按钮
 		JButton btn_Set = new JButton("\u8BBE\u7F6E");
@@ -69,7 +78,13 @@ public class MainForm extends JFrame {
 				setForm.setVisible(true);
 			}
 		});
-		btn_Set.setBounds(23, 137, 93, 23);
+		btn_Set.setBounds(38, 129, 93, 23);
 		contentPane.add(btn_Set);
+		UserDao usd = new UserDao();
+		try {
+			usd.queryAllUser();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
