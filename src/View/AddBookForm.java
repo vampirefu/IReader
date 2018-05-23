@@ -6,6 +6,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import util.MyUtils;
 import Model.BookData;
 
 import java.awt.event.ActionListener;
@@ -20,35 +21,17 @@ public class AddBookForm extends JFrame {
 	public static ArrayList<BookData> books = new ArrayList<BookData>();
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					AddBookForm frame = new AddBookForm();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
 	 * Create the frame.
 	 */
 	public AddBookForm() {
+		this.setTitle("新增");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 322, 247);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		Toolkit tool = Toolkit.getDefaultToolkit();
-		Dimension screen = tool.getScreenSize();
-		setLocation(screen.width / 2 - this.getWidth() / 2,
-				screen.height / 2 - this.getHeight() / 2);
+		MyUtils.SetFromShowCenter(AddBookForm.this);
 		final JComboBox comboBox = new JComboBox();
 		comboBox.setModel(new DefaultComboBoxModel(new String[] { "最近阅读",
 				"历史阅读" }));
@@ -58,13 +41,14 @@ public class AddBookForm extends JFrame {
 		JButton btn_OK = new JButton("确定");
 		btn_OK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (tf_Path.getText().isEmpty() || tf_BookName.getText().isEmpty()) {
-					JOptionPane.showMessageDialog(null, "书名或路径不能为空",
-							"提示", JOptionPane.INFORMATION_MESSAGE);
+				if (tf_Path.getText().isEmpty()
+						|| tf_BookName.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(null, "书名或路径不能为空", "提示",
+							JOptionPane.INFORMATION_MESSAGE);
 					return;
 				}
 				BookData book = new BookData(tf_BookName.getText(), tf_Path
-						.getText(), "", (String) comboBox.getSelectedItem());
+						.getText(), 0, (String) comboBox.getSelectedItem());
 				books.add(book);
 				if (book.getClassfy() == "最近阅读") {
 					DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(

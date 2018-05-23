@@ -19,9 +19,8 @@ public class UserDao {
 		// 这一步要弄明白！！！这是连接SQL的步骤中的其中几步
 		ResultSet rs = pstmt.executeQuery();
 		if (rs.next()) {
-
 			resultUser = new BookData(rs.getString("bookName"),
-					rs.getString("path"), rs.getString("lastSite"),
+					rs.getString("path"), rs.getInt("lastSite"),
 					rs.getString("classfy"));
 			AddBookForm.books.add(resultUser);
 		}

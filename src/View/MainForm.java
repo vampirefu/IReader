@@ -1,18 +1,16 @@
 package View;
 
-import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JButton;
 
+import util.MyUtils;
 import util.UserDao;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class MainForm extends JFrame {
 
@@ -45,10 +43,7 @@ public class MainForm extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		Toolkit tool = Toolkit.getDefaultToolkit();
-		Dimension screen = tool.getScreenSize();
-		setLocation(screen.width / 2 - this.getWidth() / 2,
-				screen.height / 2 - this.getHeight() / 2);
+		MyUtils.SetFromShowCenter(MainForm.this);
 		//书籍管理按钮
 		JButton btn_Book = new JButton("\u4E66\u7C4D\u7BA1\u7406");
 		btn_Book.addActionListener(new ActionListener() {
