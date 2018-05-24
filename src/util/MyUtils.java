@@ -6,7 +6,7 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 
 public class MyUtils {
-	//设置窗体显示在屏幕中心
+	// 设置窗体显示在屏幕中心
 	public static void SetFromShowCenter(JFrame jf) {
 		Toolkit tool = Toolkit.getDefaultToolkit();
 		Dimension screen = tool.getScreenSize();
@@ -14,4 +14,11 @@ public class MyUtils {
 				- jf.getHeight() / 2);
 	}
 
+	public static boolean String2Bool(String str) {
+		return str.contains("true");
+	}
+
+	public static String Bool2String(boolean bo) {
+		return bo ? "true" : "false";
+	}
 }

@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import util.MyUtils;
-import util.UserDao;
+import Model.ReadModel;
 
 public class MainForm extends JFrame {
 
@@ -44,11 +44,13 @@ public class MainForm extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		MyUtils.SetFromShowCenter(MainForm.this);
+		//数据初始化
+		ReadModel rModel = new ReadModel();
 		//书籍管理按钮
 		JButton btn_Book = new JButton("\u4E66\u7C4D\u7BA1\u7406");
 		btn_Book.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BookManagerForm bmForm = new BookManagerForm();
+				BookManagerForm bmForm = new BookManagerForm(rModel);
 				bmForm.setVisible(true);
 			}
 		});
@@ -59,7 +61,7 @@ public class MainForm extends JFrame {
 		btn_Read.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				mainForm.setVisible(false);
-				ReadForm rdForm = new ReadForm();
+				ReadForm rdForm = new ReadForm(rModel);
 				rdForm.setVisible(true);
 			}
 		});
@@ -69,17 +71,11 @@ public class MainForm extends JFrame {
 		JButton btn_Set = new JButton("\u8BBE\u7F6E");
 		btn_Set.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				SettingForm setForm = new SettingForm();
+				SettingForm setForm = new SettingForm(rModel);
 				setForm.setVisible(true);
 			}
 		});
 		btn_Set.setBounds(38, 129, 93, 23);
 		contentPane.add(btn_Set);
-		UserDao usd = new UserDao();
-		try {
-			usd.queryAllUser();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 }

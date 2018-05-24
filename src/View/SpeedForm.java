@@ -1,20 +1,15 @@
 package View;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.JComboBox;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollBar;
-import javax.swing.Timer;
+import javax.swing.border.EmptyBorder;
 
 import util.MyUtils;
 
@@ -22,15 +17,13 @@ public class SpeedForm extends JFrame {
 
 	private JPanel contentPane;
 	private Integer msg[] = { 1, 10, 18, 36, 48, 66, 80, 90 };
-	private JScrollBar jsb;
-	Integer speed;
+	private Integer speed;
 	private JComboBox cbx_Speed;
 
 	/**
 	 * Create the frame.
 	 */
 	public SpeedForm(final JScrollBar jsb) {
-		this.jsb = jsb;
 		setTitle("滚屏速度设置");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 236, 156);

@@ -1,29 +1,34 @@
 package View;
 
-import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import util.MyUtils;
 import Model.BookData;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
+import Model.ReadModel;
 
 public class AddBookForm extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField tf_Path;
 	private JTextField tf_BookName;
-	public static ArrayList<BookData> books = new ArrayList<BookData>();
+	private JComboBox comboBox;
 
 	/**
 	 * Create the frame.
 	 */
-	public AddBookForm() {
+	public AddBookForm(final ReadModel rModel) {
 		this.setTitle("新增");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 322, 247);
@@ -32,7 +37,8 @@ public class AddBookForm extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		MyUtils.SetFromShowCenter(AddBookForm.this);
-		final JComboBox comboBox = new JComboBox();
+		// 下拉框
+		comboBox = new JComboBox();
 		comboBox.setModel(new DefaultComboBoxModel(new String[] { "最近阅读",
 				"历史阅读" }));
 		comboBox.setBounds(188, 130, 108, 21);
@@ -49,7 +55,14 @@ public class AddBookForm extends JFrame {
 				}
 				BookData book = new BookData(tf_BookName.getText(), tf_Path
 						.getText(), 0, (String) comboBox.getSelectedItem());
-				books.add(book);
+				// 新增书籍数据
+				rModel.books.add(book);
+				try {
+					rModel.bookDao.insert(book);
+				} catch (Exception e1) {
+					System.out.println("新增书籍失败");
+				}
+				// 应用至树
 				if (book.getClassfy() == "最近阅读") {
 					DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(
 							book.getBookName());

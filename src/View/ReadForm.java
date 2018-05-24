@@ -3,12 +3,10 @@ package View;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -18,6 +16,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -41,6 +40,7 @@ import util.MyUtils;
 import Conntrol.MSWordManager;
 import Conntrol.SaveAndSaveAs;
 import Model.BookData;
+import Model.ReadModel;
 
 public class ReadForm extends JFrame {
 	JTextArea content;
@@ -54,20 +54,22 @@ public class ReadForm extends JFrame {
 	private Boolean autoLineWrap = true;
 	// 文本是否支持编辑
 	private Boolean isEdit = false;
-	JScrollPane contentScroll;
+	private JScrollPane contentScroll;
 	private JScrollBar jsb;
 	int delay = 10;
-	Timer timer = new Timer(delay, new ActionListener() {
+	private Timer timer = new Timer(delay, new ActionListener() {
 		public void actionPerformed(ActionEvent evt) {
 			jsb.setValue(lastSite = jsb.getValue() + jsb.getUnitIncrement());
 		}
 	});
+	private boolean flag = true;
+	private String str_filePath = null;
+	private String fileName;
+	private int lastSite;
+	private ReadModel rModel;
 
-	boolean flag = true;
-	String str_filePath = null;
-	int lastSite;
-
-	public ReadForm() {
+	public ReadForm(final ReadModel rModel) {
+		this.rModel = rModel;
 		this.setSize(780, 553);
 		// 文字输入框（文字显示窗口）
 		content = new JTextArea(10, 50);
@@ -183,9 +185,16 @@ public class ReadForm extends JFrame {
 		mui_Open.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
+					// 清空
+					if (!content.getText().isEmpty())
+						content.setText("");
 					JFileChooser jfc = new JFileChooser();
 					if (jfc.showOpenDialog(ReadForm.this) == JFileChooser.APPROVE_OPTION) {
-						str_filePath = jfc.getSelectedFile().getAbsolutePath();
+						File file = jfc.getSelectedFile();
+						if (file == null)
+							return;
+						fileName = file.getName();// 获得文件名
+						str_filePath = file.getAbsolutePath();
 						// 打开TXT
 						if (str_filePath.contains(".txt")) {
 							BufferedReader bufferedReader = new BufferedReader(
@@ -201,13 +210,22 @@ public class ReadForm extends JFrame {
 								}
 							}
 							bufferedReader.close();
-							// 滚动条置顶
-							content.setCaretPosition(0);
 							// 打开word文件
 						} else if (str_filePath.contains(".doc")
 								|| str_filePath.contains(".docx")) {
 							MSWordManager ms = new MSWordManager(true);
 							ms.openDocument(str_filePath);
+						}
+						// 滚动条置顶
+						content.setCaretPosition(0);
+						ReadForm.this.setTitle(str_filePath);
+						BookData bd = new BookData(fileName, str_filePath, 0,
+								"最近阅读");
+						rModel.curBook = bd;
+						try {
+							rModel.bookDao.insert(bd);
+						} catch (Exception e1) {
+							System.out.println("新增书籍失败");
 						}
 					}
 				} catch (FileNotFoundException e1) {
@@ -318,6 +336,9 @@ public class ReadForm extends JFrame {
 
 	public void OpenBook(BookData book) {
 		try {
+			// 清空
+			if (!content.getText().isEmpty())
+				content.setText("");
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(
 					book.getPath()));
 			String str_line;
@@ -330,11 +351,18 @@ public class ReadForm extends JFrame {
 				}
 			}
 			bufferedReader.close();
+			// 滚动条置顶
+			content.setCaretPosition(0);
+			ReadForm.this.setTitle(book.getPath());
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e2) {
 			e2.printStackTrace();
 		}
+	}
+
+	private void AddReadData() {
+
 	}
 }
