@@ -1,5 +1,6 @@
 package util;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
@@ -20,5 +21,13 @@ public class MyUtils {
 
 	public static String Bool2String(boolean bo) {
 		return bo ? "true" : "false";
+	}
+
+	public static Color String2Color(String str) {
+		String str1 = str.replaceAll("(", "");
+		String str2 = str1.replaceAll(")", "").trim();
+		String[] splits = str2.split(",");
+		return new Color(Integer.parseInt(splits[0]),
+				Integer.parseInt(splits[1]), Integer.parseInt(splits[2]));
 	}
 }

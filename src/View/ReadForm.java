@@ -3,12 +3,15 @@ package View;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -40,20 +43,17 @@ import util.MyUtils;
 import Conntrol.MSWordManager;
 import Conntrol.SaveAndSaveAs;
 import Model.BookData;
+import Model.ReadData;
 import Model.ReadModel;
 
 public class ReadForm extends JFrame {
-	JTextArea content;
-	JMenuBar menubar = new JMenuBar();
-	JMenu menu_file = new JMenu("文件");
-	JMenuItem mui_Open = new JMenuItem("打开");
-	JMenuItem mui_Save = new JMenuItem("保存");
-	JMenuItem mui_SaveAs = new JMenuItem("另存为");
-	JMenuItem mui_Exit = new JMenuItem("退出");
-	// 是否换行
-	private Boolean autoLineWrap = true;
-	// 文本是否支持编辑
-	private Boolean isEdit = false;
+	private JTextArea content;
+	private JMenuBar menubar = new JMenuBar();
+	private JMenu menu_file = new JMenu("文件");
+	private JMenuItem mui_Open = new JMenuItem("打开");
+	private JMenuItem mui_Save = new JMenuItem("保存");
+	private JMenuItem mui_SaveAs = new JMenuItem("另存为");
+	private JMenuItem mui_Exit = new JMenuItem("退出");
 	private JScrollPane contentScroll;
 	private JScrollBar jsb;
 	int delay = 10;
@@ -66,7 +66,9 @@ public class ReadForm extends JFrame {
 	private String str_filePath = null;
 	private String fileName;
 	private int lastSite;
+	private int barMax;
 	private ReadModel rModel;
+	private BookManagerForm bForm;
 
 	public ReadForm(final ReadModel rModel) {
 		this.rModel = rModel;
@@ -74,10 +76,16 @@ public class ReadForm extends JFrame {
 		// 文字输入框（文字显示窗口）
 		content = new JTextArea(10, 50);
 		content.setAutoscrolls(true);
-		content.setEditable(isEdit);
-		if (!isEdit)
+		content.setEditable(rModel.setData.isCanEdit());
+		if (!rModel.setData.isCanEdit())
 			mui_Save.setVisible(false);
-		content.setLineWrap(autoLineWrap);// 设置自动换行
+		content.setLineWrap(rModel.setData.isAutoLineWrap());// 设置自动换行
+		if (rModel.curRead != null) {
+			content.setForeground(MyUtils.String2Color(rModel.curRead
+					.getFontColor()));
+			content.setBackground(MyUtils.String2Color(rModel.curRead
+					.getBackground()));
+		}
 		contentScroll = new JScrollPane(content);
 		// 滚动条
 		jsb = contentScroll.getVerticalScrollBar();
@@ -119,6 +127,18 @@ public class ReadForm extends JFrame {
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				super.windowClosing(e);
+				if (rModel.curBook != null) {
+					rModel.curBook.setLastSite(lastSite);
+					try {
+						rModel.bookDao.update(rModel.curBook);
+					} catch (Exception e1) {
+						System.out.println("更新书签位置失败");
+					}
+				}
+				if (bForm != null) {
+					bForm.setVisible(true);
+					return;
+				}
 				if (MainForm.mainForm != null)
 					MainForm.mainForm.setVisible(true);
 			}
@@ -127,7 +147,8 @@ public class ReadForm extends JFrame {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO 自动生成的方法存根
+				if (!rModel.setData.isAutoPaging())
+					return;
 				if (e.getClickCount() == 2) {
 					timer.start();
 				}
@@ -160,7 +181,7 @@ public class ReadForm extends JFrame {
 
 			}
 		});
-		// 监听上下键//
+		// 监听上下键
 		content.addKeyListener(new KeyListener() {
 			@Override
 			public void keyPressed(KeyEvent arg0) {
@@ -216,14 +237,22 @@ public class ReadForm extends JFrame {
 							MSWordManager ms = new MSWordManager(true);
 							ms.openDocument(str_filePath);
 						}
+						barMax = jsb.getValue();
 						// 滚动条置顶
 						content.setCaretPosition(0);
 						ReadForm.this.setTitle(str_filePath);
 						BookData bd = new BookData(fileName, str_filePath, 0,
 								"最近阅读");
+						Font font = content.getFont();
+						rModel.curRead = new ReadData(str_filePath, font
+								.getSize(), font.getStyle(),
+								font.getFontName(), "(0,0,0)", "(255,255,255)",
+								jsb.getUnitIncrement());
 						rModel.curBook = bd;
+						// 数据库同步
 						try {
 							rModel.bookDao.insert(bd);
+							rModel.readDao.insert(rModel.curRead);
 						} catch (Exception e1) {
 							System.out.println("新增书籍失败");
 						}
@@ -268,7 +297,7 @@ public class ReadForm extends JFrame {
 		// （菜单栏）编辑——字体
 		mui_Font.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				FontSetting fsForm = new FontSetting(content);
+				FontSetting fsForm = new FontSetting(content, rModel);
 				fsForm.setVisible(true);
 			}
 		});
@@ -278,6 +307,12 @@ public class ReadForm extends JFrame {
 				Color color = JColorChooser.showDialog(ReadForm.this, "选择颜色",
 						Color.BLACK);
 				content.setForeground(color);
+				rModel.curRead.setFontColor(color.toString());
+				try {
+					rModel.readDao.update(rModel.curRead);
+				} catch (Exception e1) {
+					System.out.println("更新字体颜色失败");
+				}
 			}
 		});
 		// （菜单栏）编辑——背景色
@@ -287,12 +322,18 @@ public class ReadForm extends JFrame {
 				Color color = JColorChooser.showDialog(ReadForm.this, "选择颜色",
 						Color.WHITE);
 				content.setBackground(color);
+				rModel.curRead.setBackground(color.toString());
+				try {
+					rModel.readDao.update(rModel.curRead);
+				} catch (Exception e1) {
+					System.out.println("更新背景色失败");
+				}
 			}
 		});
 		// （菜单栏）编辑——滚轮速度
 		mui_Speed.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new SpeedForm(jsb).setVisible(true);
+				new SpeedForm(jsb, rModel).setVisible(true);
 			}
 		});
 
@@ -306,7 +347,7 @@ public class ReadForm extends JFrame {
 		JButton btn_Last = new JButton("上一页");
 		btn_Last.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				lastSite = contentScroll.getVerticalScrollBar().getValue();
+				lastSite = jsb.getValue();
 				jsb.setValue(lastSite -= contentScroll.getHeight());
 			}
 		});
@@ -322,7 +363,7 @@ public class ReadForm extends JFrame {
 		btn_Next.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		btn_Next.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				lastSite = contentScroll.getVerticalScrollBar().getValue();
+				lastSite = jsb.getValue();
 				jsb.setValue(lastSite += contentScroll.getHeight());
 			}
 		});
@@ -331,10 +372,17 @@ public class ReadForm extends JFrame {
 		gbc_btn_Next.gridx = 4;
 		gbc_btn_Next.gridy = 0;
 		buttonp.add(btn_Next, gbc_btn_Next);
+		jsb.addAdjustmentListener(new AdjustmentListener() {
+			public void adjustmentValueChanged(AdjustmentEvent e) {
+				if (jsb.getValue() == jsb.getMaximum())
+					System.out.println("滚到底了");
+			}
+		});
 
 	}
 
-	public void OpenBook(BookData book) {
+	public void OpenBook(BookData book, BookManagerForm bmForm) {
+		this.bForm = bmForm;
 		try {
 			// 清空
 			if (!content.getText().isEmpty())
@@ -351,18 +399,24 @@ public class ReadForm extends JFrame {
 				}
 			}
 			bufferedReader.close();
+			barMax = jsb.getValue();
 			// 滚动条置顶
 			content.setCaretPosition(0);
 			ReadForm.this.setTitle(book.getPath());
+			Font font = content.getFont();
+			rModel.curRead = new ReadData(book.getPath(), font.getSize(),
+					font.getStyle(), font.getFontName(), "(0,0,0)",
+					"(255,255,255)", jsb.getUnitIncrement());
+			try {
+				rModel.readDao.insert(rModel.curRead);
+			} catch (Exception e) {
+				System.out.println("新增阅读数据失败");
+			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e2) {
 			e2.printStackTrace();
 		}
 	}
 
-	private void AddReadData() {
-
-	}
 }

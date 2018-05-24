@@ -1,6 +1,7 @@
 package Model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import util.BookDao;
 import util.ReadDao;
@@ -8,7 +9,6 @@ import util.SettingDao;
 
 public class ReadModel {
 	public ArrayList<BookData> books;
-	public ArrayList<ReadData> reads;
 	// 系统设置数据
 	public SettingData setData;
 	// 当前书籍数据
@@ -20,7 +20,7 @@ public class ReadModel {
 	public SettingDao setDao;
 
 	public ReadModel() {
-	 bookDao = new BookDao();
+		bookDao = new BookDao();
 		try {
 			books = bookDao.queryAll();
 		} catch (Exception e) {
@@ -28,12 +28,6 @@ public class ReadModel {
 			System.out.println("获取书籍数据失败");
 		}
 		readDao = new ReadDao();
-		try {
-			reads = readDao.queryAllUser();
-		} catch (Exception e) {
-			reads = new ArrayList<ReadData>();
-			System.out.println("获取阅读数据失败");
-		}
 		setDao = new SettingDao();
 		try {
 			setData = setDao.queryAllUser();

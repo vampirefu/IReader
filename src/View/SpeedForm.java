@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.border.EmptyBorder;
 
+import Model.ReadModel;
 import util.MyUtils;
 
 public class SpeedForm extends JFrame {
@@ -23,7 +24,7 @@ public class SpeedForm extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public SpeedForm(final JScrollBar jsb) {
+	public SpeedForm(final JScrollBar jsb, final ReadModel rm) {
 		setTitle("滚屏速度设置");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 236, 156);
@@ -41,7 +42,11 @@ public class SpeedForm extends JFrame {
 		cbx_Speed.setBounds(74, 22, 114, 21);
 		contentPane.add(cbx_Speed);
 		cbx_Speed.setEditable(true);
-		cbx_Speed.setSelectedItem(jsb.getUnitIncrement());
+		if (rm.curRead == null)
+			// 设置当前滚速
+			cbx_Speed.setSelectedItem(jsb.getUnitIncrement());
+		else
+			cbx_Speed.setSelectedItem(rm.curRead.getSpeed());
 
 		JButton btn_Cancel = new JButton("取消");
 		btn_Cancel.addActionListener(new ActionListener() {
@@ -57,6 +62,14 @@ public class SpeedForm extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				speed = (Integer) cbx_Speed.getSelectedItem();
 				jsb.setUnitIncrement(speed.intValue());
+				if (rm.curRead != null) {
+					rm.curRead.setSpeed(speed.intValue());
+					try {
+						rm.readDao.update(rm.curRead);
+					} catch (Exception e1) {
+						System.out.println("更新滚速失败");
+					}
+				}
 				dispose();
 			}
 		});

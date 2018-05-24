@@ -1,24 +1,22 @@
 package util;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
 
 import Model.ReadData;
 
 public class ReadDao {
-	public ArrayList<ReadData> queryAllUser() throws Exception {
-		ArrayList<ReadData> rds = new ArrayList<ReadData>();
+	public ReadData select(String path) throws Exception {
 		ReadData resultUser = null;
-		String sql = "SELECT * FROM t_readinfo";// 查询表中所有记录
+		String sql = "SELECT fontSize,fontStyle,fontName,fontColor,background,speed FROM t_readinfo WHERE fk_path='"
+				+ path + "'";
 		ResultSet rs = DbUtil.getInstance().selectsql(sql);
-		while (rs.next()) {
+		if (rs.next()) {
 			resultUser = new ReadData(rs.getString("fk_path"),
 					rs.getInt("fontSize"), rs.getInt("fontStyle"),
 					rs.getString("fontName"), rs.getString("fontColor"),
 					rs.getString("background"), rs.getInt("speed"));
-			rds.add(resultUser);
 		}
-		return rds;
+		return resultUser;
 	}
 
 	// 添加操作

@@ -16,6 +16,7 @@ public class MainForm extends JFrame {
 
 	private JPanel contentPane;
 	public static MainForm mainForm;
+	private ReadModel rModel;
 
 	/**
 	 * Launch the application.
@@ -44,12 +45,12 @@ public class MainForm extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		MyUtils.SetFromShowCenter(MainForm.this);
-		//数据初始化
-		ReadModel rModel = new ReadModel();
+		rModel = new ReadModel();
 		//书籍管理按钮
 		JButton btn_Book = new JButton("\u4E66\u7C4D\u7BA1\u7406");
 		btn_Book.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				mainForm.setVisible(false);
 				BookManagerForm bmForm = new BookManagerForm(rModel);
 				bmForm.setVisible(true);
 			}

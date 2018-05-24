@@ -14,6 +14,9 @@ import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
 import util.MyUtils;
+import Model.ReadData;
+import Model.ReadModel;
+import Model.SettingData;
 
 public class FontSetting extends JFrame {
 
@@ -26,7 +29,7 @@ public class FontSetting extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public FontSetting(final JTextArea content) {
+	public FontSetting(final JTextArea content, final ReadModel rModel) {
 		setTitle("字体设置");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 256, 195);
@@ -66,11 +69,15 @@ public class FontSetting extends JFrame {
 		contentPane.add(cbx_Font);
 		cbx_Font.setEditable(true);
 
-		if (!content.getText().isEmpty()) {
+		if (rModel.curRead == null) {
 			Font font = content.getFont();
 			cbx_FontSize.setSelectedItem(font.getSize());
 			cbx_Font.setSelectedItem(font.getFontName());
 			cbx_FontStyle.setSelectedItem(style[font.getStyle()]);
+		} else {
+			cbx_FontSize.setSelectedItem(rModel.curRead.getFontSize());
+			cbx_Font.setSelectedItem(rModel.curRead.getFontName());
+			cbx_FontStyle.setSelectedItem(style[rModel.curRead.getFontStyle()]);
 		}
 
 		JButton btn_Cancel = new JButton("取消");
@@ -88,9 +95,16 @@ public class FontSetting extends JFrame {
 				try {
 					String wordName = (String) cbx_Font.getSelectedItem();
 					int wordStyle = cbx_FontStyle.getSelectedIndex();
-					String wordSize = cbx_FontSize.getSelectedItem().toString();
-					content.setFont(new Font(wordName, wordStyle, Integer
-							.parseInt(wordSize)));
+					int wordSize = Integer.parseInt(cbx_FontSize
+							.getSelectedItem().toString());
+					content.setFont(new Font(wordName, wordStyle, wordSize));
+					if (rModel.curRead != null) {
+						rModel.curRead.setFontName(wordName);
+						rModel.curRead.setFontStyle(wordStyle);
+						rModel.curRead.setFontSize(wordSize);
+						// 数据库同步
+						rModel.readDao.update(rModel.curRead);
+					}
 					dispose();
 				} catch (Exception e0) {
 					e0.printStackTrace();

@@ -2,6 +2,8 @@ package View;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -52,7 +54,7 @@ public class BookManagerForm extends JFrame {
 		tree.setBounds(0, 0, 168, 261);
 		contentPane.add(tree);
 
-		// 按钮
+		// 新增按钮
 		JButton btn_Add = new JButton("新增");
 		btn_Add.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -63,7 +65,7 @@ public class BookManagerForm extends JFrame {
 		btn_Add.setBounds(178, 30, 93, 23);
 		contentPane.add(btn_Add);
 
-		// 按钮
+		// 删除按钮
 		JButton btn_Del = new JButton("删除");
 		btn_Del.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -81,14 +83,24 @@ public class BookManagerForm extends JFrame {
 					DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
 					// 删除指定节点
 					model.removeNodeFromParent(selectedNode);
-					for (BookData bd : rModel.books) {
+					for (int i = 0; i < rModel.books.size(); i++) {
+						BookData bd = rModel.books.get(i);
 						if (bd.getBookName().contains(selectedNode.toString())) {
-							rModel.books.remove(bd);
+							// 数据库同步
 							try {
+								rModel.curRead = rModel.readDao.select(bd
+										.getPath());
 								rModel.bookDao.delete(bd);
+								if (rModel.curRead != null
+										&& bd.getPath() == rModel.curRead
+												.getFk_path()) {
+									rModel.readDao.delete(rModel.curRead);
+								}
 							} catch (Exception e1) {
 								System.out.println("删除书籍失败");
 							}
+							rModel.books.remove(bd);
+							i--;
 						}
 					}
 				}
@@ -97,7 +109,7 @@ public class BookManagerForm extends JFrame {
 		btn_Del.setBounds(178, 89, 93, 23);
 		contentPane.add(btn_Del);
 
-		// 按钮
+		// 阅读按钮
 		JButton btn_Read = new JButton("阅读");
 		btn_Read.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -112,13 +124,13 @@ public class BookManagerForm extends JFrame {
 					return;
 				for (BookData book : rModel.books) {
 					if (book.getBookName().trim() == selectedNode.toString()) {
+						// 设置当前阅读
 						rModel.curBook = book;
 						break;
 					}
 				}
 				if (rModel.curBook != null)
-					rd.OpenBook(rModel.curBook);
-
+					rd.OpenBook(rModel.curBook, BookManagerForm.this);
 			}
 		});
 		btn_Read.setBounds(178, 152, 93, 23);
@@ -134,6 +146,13 @@ public class BookManagerForm extends JFrame {
 		contentPane.add(btn_Back);
 		// 树数据初始化
 		DataIni();
+		this.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				super.windowClosing(e);
+				if (MainForm.mainForm != null)
+					MainForm.mainForm.setVisible(true);
+			}
+		});
 	}
 
 	private void DataIni() {
