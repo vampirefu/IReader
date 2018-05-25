@@ -10,8 +10,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -59,14 +57,12 @@ public class ReadForm extends JFrame {
 	int delay = 10;
 	private Timer timer = new Timer(delay, new ActionListener() {
 		public void actionPerformed(ActionEvent evt) {
-			jsb.setValue(lastSite = jsb.getValue() + jsb.getUnitIncrement());
+			jsb.setValue(jsb.getValue() + jsb.getUnitIncrement());
 		}
 	});
 	private boolean flag = true;
 	private String str_filePath = null;
 	private String fileName;
-	private int lastSite;
-	private int barMax;
 	private ReadModel rModel;
 	private BookManagerForm bForm;
 
@@ -79,7 +75,8 @@ public class ReadForm extends JFrame {
 		content.setEditable(rModel.setData.isCanEdit());
 		if (!rModel.setData.isCanEdit())
 			mui_Save.setVisible(false);
-		content.setLineWrap(rModel.setData.isAutoLineWrap());// 设置自动换行
+		// 设置自动换行
+		content.setLineWrap(rModel.setData.isAutoLineWrap());
 		contentScroll = new JScrollPane(content);
 		// 滚动条
 		jsb = contentScroll.getVerticalScrollBar();
@@ -143,18 +140,40 @@ public class ReadForm extends JFrame {
 		this.setTitle("TXT小说阅读器");
 		this.setVisible(true);
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
+		// 窗体关闭事件
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				super.windowClosing(e);
 				if (rModel.curBook != null) {
 					rModel.curBook.setLastSite(jsb.getValue());
+
+					BookData tempBD = null;
+					for (BookData bd : rModel.books) {
+						if (bd.getLastRead() == 1) {
+							tempBD = bd;
+							break;
+						}
+					}
+					if (tempBD != null) {
+						tempBD.setLastRead(0);
+						try {
+							rModel.bookDao.update(tempBD);
+						} catch (Exception e1) {
+							System.out.println("取消其他上次阅读");
+						}
+					}
+					if (rModel.setData.isContinueRead())
+						rModel.curBook.setLastRead(1);
+					if (rModel.setData.isAutoClassfy()
+							&& jsb.getValue() == jsb.getMaximum())
+						rModel.curBook.setClassfy("历史阅读");
 					try {
 						rModel.bookDao.update(rModel.curBook);
 					} catch (Exception e1) {
 						System.out.println("更新书签位置失败");
 					}
 				}
+
 				if (bForm != null) {
 					bForm.setVisible(true);
 					return;
@@ -206,12 +225,10 @@ public class ReadForm extends JFrame {
 			@Override
 			public void keyPressed(KeyEvent arg0) {
 				if (arg0.getKeyCode() == KeyEvent.VK_UP) {
-					jsb.setValue(lastSite = jsb.getValue()
-							- jsb.getUnitIncrement());
+					jsb.setValue(jsb.getValue() - jsb.getUnitIncrement());
 				}
 				if (arg0.getKeyCode() == KeyEvent.VK_DOWN) {
-					jsb.setValue(lastSite = jsb.getValue()
-							+ jsb.getUnitIncrement());
+					jsb.setValue(jsb.getValue() + jsb.getUnitIncrement());
 				}
 			}
 
@@ -257,12 +274,11 @@ public class ReadForm extends JFrame {
 							MSWordManager ms = new MSWordManager(true);
 							ms.openDocument(str_filePath);
 						}
-						barMax = jsb.getValue();
 						// 滚动条置顶
 						content.setCaretPosition(0);
 						ReadForm.this.setTitle(str_filePath);
 						BookData bd = new BookData(fileName, str_filePath, 0,
-								"最近阅读");
+								"最近阅读", 0);
 						Font font = content.getFont();
 						rModel.curRead = new ReadData(str_filePath, font
 								.getSize(), font.getStyle(),
@@ -367,8 +383,7 @@ public class ReadForm extends JFrame {
 		JButton btn_Last = new JButton("上一页");
 		btn_Last.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				lastSite = jsb.getValue();
-				jsb.setValue(lastSite -= contentScroll.getHeight());
+				jsb.setValue(jsb.getValue() - contentScroll.getHeight());
 			}
 		});
 		GridBagConstraints gbc_btn_Last = new GridBagConstraints();
@@ -383,8 +398,7 @@ public class ReadForm extends JFrame {
 		btn_Next.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		btn_Next.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				lastSite = jsb.getValue();
-				jsb.setValue(lastSite += contentScroll.getHeight());
+				jsb.setValue(jsb.getValue() + contentScroll.getHeight());
 			}
 		});
 		GridBagConstraints gbc_btn_Next = new GridBagConstraints();
@@ -393,15 +407,14 @@ public class ReadForm extends JFrame {
 		gbc_btn_Next.gridy = 0;
 		buttonp.add(btn_Next, gbc_btn_Next);
 
-		// 滚动条监听
-		jsb.addAdjustmentListener(new AdjustmentListener() {
-			public void adjustmentValueChanged(AdjustmentEvent e) {
-				if (jsb.getValue() == jsb.getMaximum())
-					System.out.println("滚到底了");
-			}
-		});
-
 	}
+
+	private Timer timer_jsb = new Timer(delay, new ActionListener() {
+		public void actionPerformed(ActionEvent evt) {
+			jsb.setValue(rModel.curBook.getLastSite());
+			timer_jsb.stop();
+		}
+	});
 
 	public void OpenBook(BookData book, BookManagerForm bmForm) {
 		this.bForm = bmForm;
@@ -420,11 +433,11 @@ public class ReadForm extends JFrame {
 					content.setText(content.getText() + "\n" + str_line);
 				}
 			}
+
 			bufferedReader.close();
-			barMax = jsb.getValue();
-			// 书签还原
-			content.setCaretPosition(book.getLastSite());
 			ReadForm.this.setTitle(book.getPath());
+			System.out.println(rModel.curBook.getLastSite());
+			timer_jsb.start();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e2) {

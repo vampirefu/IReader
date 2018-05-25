@@ -15,7 +15,8 @@ public class BookDao {
 		ResultSet rs = DbUtil.getInstance().selectsql(sql);
 		while (rs.next()) {
 			book = new BookData(rs.getString("bookName"), rs.getString("path"),
-					rs.getInt("lastSite"), rs.getString("classfy"));
+					rs.getInt("lastSite"), rs.getString("classfy"),
+					rs.getInt("lastRead"));
 			books.add(book);
 		}
 		return books;
@@ -24,9 +25,17 @@ public class BookDao {
 	// 添加操作
 	public void insert(BookData sd) throws Exception {
 		String path = sd.getPath().replace("\\", "\\\\");
-		String sql = "INSERT INTO t_bookinfo(path,bookName,lastSite,classfy)"
-				+ "VALUES('" + path + "','" + sd.getBookName() + "',"
-				+ sd.getLastSite() + ",'" + sd.getClassfy() + "')";
+		String sql = "INSERT INTO t_bookinfo(path,bookName,lastSite,classfy,lastRead)"
+				+ "VALUES('"
+				+ path
+				+ "','"
+				+ sd.getBookName()
+				+ "',"
+				+ sd.getLastSite()
+				+ ",'"
+				+ sd.getClassfy()
+				+ ","
+				+ sd.getLastRead() + ")";
 		DbUtil.getInstance().insertsql(sql);
 	}
 
@@ -42,7 +51,8 @@ public class BookDao {
 		String path = sd.getPath().replace("\\", "\\\\");
 		String sql = "UPDATE t_bookinfo SET path = '" + path + "',bookName='"
 				+ sd.getBookName() + "',lastSite= " + sd.getLastSite()
-				+ ",classfy= '" + sd.getClassfy() + "'";
+				+ ",classfy= '" + sd.getClassfy() + "',lastRead= "
+				+ sd.getLastRead();
 		DbUtil.getInstance().updatasql(sql);
 	}
 

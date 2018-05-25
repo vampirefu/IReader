@@ -63,7 +63,7 @@ public class AddBookForm extends JFrame {
 					return;
 				}
 				BookData book = new BookData(tf_BookName.getText(), ta_Path
-						.getText(), 0, (String) comboBox.getSelectedItem());
+						.getText(), 0, (String) comboBox.getSelectedItem(), 0);
 				// 新增书籍数据
 				rModel.books.add(book);
 				try {
@@ -110,7 +110,7 @@ public class AddBookForm extends JFrame {
 		contentPane.add(lb_BookName);
 
 		tf_BookName = new JTextField();
-		tf_BookName.setBounds(23, 130, 66, 21);
+		tf_BookName.setBounds(23, 130, 124, 21);
 		contentPane.add(tf_BookName);
 		tf_BookName.setColumns(10);
 

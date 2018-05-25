@@ -138,7 +138,7 @@ public class BookManagerForm extends JFrame {
 		});
 		btn_Read.setBounds(178, 152, 93, 23);
 		contentPane.add(btn_Read);
-		// 按钮
+		// 返回按钮
 		JButton btn_Back = new JButton("返回上一级");
 		btn_Back.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

@@ -10,6 +10,16 @@ public class BookData {
 	private int lastSite;
 	// 分类
 	private String classfy;
+	// 0为非上次阅读，1为上次阅读
+	private int lastRead;
+
+	public int getLastRead() {
+		return lastRead;
+	}
+
+	public void setLastRead(int lastRead) {
+		this.lastRead = lastRead;
+	}
 
 	public String getBookName() {
 		return bookName;
@@ -43,12 +53,14 @@ public class BookData {
 		this.classfy = classfy;
 	}
 
-	public BookData(String bookName, String path, int lastSite, String classfy) {
+	public BookData(String bookName, String path, int lastSite, String classfy,
+			int lastRead) {
 		super();
 		this.bookName = bookName;
 		this.path = path;
 		this.lastSite = lastSite;
 		this.classfy = classfy;
+		this.lastRead = lastRead;
 	}
 
 }

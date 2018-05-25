@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import util.MyUtils;
+import Model.BookData;
 import Model.ReadModel;
 
 public class MainForm extends JFrame {
@@ -26,7 +27,6 @@ public class MainForm extends JFrame {
 			public void run() {
 				try {
 					mainForm = new MainForm();
-					mainForm.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -78,5 +78,22 @@ public class MainForm extends JFrame {
 		});
 		btn_Set.setBounds(38, 129, 93, 23);
 		contentPane.add(btn_Set);
+
+		if (rModel.setData.isContinueRead()) {
+			for (BookData bd : rModel.books) {
+				if (bd.getLastRead() == 1) {
+					rModel.curBook = bd;
+					break;
+				}
+			}
+			if (rModel.curBook == null)
+				return;
+			ReadForm rd = new ReadForm(rModel);
+			rd.setVisible(true);
+			this.setVisible(false);
+			rd.OpenBook(rModel.curBook, null);
+			return;
+		}
+		this.setVisible(true);
 	}
 }
