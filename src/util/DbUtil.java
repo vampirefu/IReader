@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 public class DbUtil {
 	// 要连接的数据库名，　账号及密码，和驱动
-	private String dbUrl = "jdbc:mysql://localhost/itcast_oa";
+	private String dbUrl = "jdbc:mysql://localhost/itcast_oa?useUnicode=true&characterEncoding=utf-8";// ?useUnicode=true&characterEncoding=utf-8为了使数据库识别汉字
 
 	private String dbUserName = "itcastoa";
 

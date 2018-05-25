@@ -107,7 +107,7 @@ public class FontSetting extends JFrame {
 					}
 					dispose();
 				} catch (Exception e0) {
-					e0.printStackTrace();
+					System.out.println("字体数据同步失败");
 				}
 			}
 		});

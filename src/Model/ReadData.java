@@ -5,8 +5,8 @@ public class ReadData {
 	private int fontSize;
 	private int fontStyle;
 	private String fontName;
-	private String fontColor;
-	private String background;
+	private int fontColor;
+	private int background;
 	private int speed;
 
 	public String getFk_path() {
@@ -41,19 +41,19 @@ public class ReadData {
 		this.fontName = fontName;
 	}
 
-	public String getFontColor() {
+	public int getFontColor() {
 		return fontColor;
 	}
 
-	public void setFontColor(String fontColor) {
+	public void setFontColor(int fontColor) {
 		this.fontColor = fontColor;
 	}
 
-	public String getBackground() {
+	public int getBackground() {
 		return background;
 	}
 
-	public void setBackground(String background) {
+	public void setBackground(int background) {
 		this.background = background;
 	}
 
@@ -66,7 +66,7 @@ public class ReadData {
 	}
 
 	public ReadData(String fk_path, int fontSize, int fontStyle,
-			String fontName, String fontColor, String background, int speed) {
+			String fontName, int fontColor, int background, int speed) {
 		super();
 		this.fk_path = fk_path;
 		this.fontSize = fontSize;

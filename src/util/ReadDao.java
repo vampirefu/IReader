@@ -8,33 +8,34 @@ public class ReadDao {
 	public ReadData select(String path) throws Exception {
 		ReadData resultUser = null;
 		String sql = "SELECT fontSize,fontStyle,fontName,fontColor,background,speed FROM t_readinfo WHERE fk_path='"
-				+ path + "'";
+				+ path.replace("\\", "\\\\") + "'";
 		ResultSet rs = DbUtil.getInstance().selectsql(sql);
 		if (rs.next()) {
-			resultUser = new ReadData(rs.getString("fk_path"),
-					rs.getInt("fontSize"), rs.getInt("fontStyle"),
-					rs.getString("fontName"), rs.getString("fontColor"),
-					rs.getString("background"), rs.getInt("speed"));
+			resultUser = new ReadData(path, rs.getInt("fontSize"),
+					rs.getInt("fontStyle"), rs.getString("fontName"),
+					rs.getInt("fontColor"), rs.getInt("background"),
+					rs.getInt("speed"));
 		}
 		return resultUser;
 	}
 
 	// 添加操作
 	public void insert(ReadData sd) throws Exception {
+		String path = sd.getFk_path().replace("\\", "\\\\");
 		String sql = "INSERT INTO t_readinfo(fk_path,fontSize,fontStyle,fontName,fontColor,background,speed)"
 				+ "VALUES('"
-				+ sd.getFk_path()
+				+ path
 				+ "',"
 				+ sd.getFontSize()
 				+ ","
 				+ sd.getFontStyle()
 				+ ",'"
 				+ sd.getFontName()
-				+ "','"
-				+ sd.getFontColor()
-				+ "','"
-				+ sd.getBackground()
 				+ "',"
+				+ sd.getFontColor()
+				+ ","
+				+ sd.getBackground()
+				+ ","
 				+ sd.getSpeed() + ")";
 		DbUtil.getInstance().insertsql(sql);
 	}
@@ -48,11 +49,12 @@ public class ReadDao {
 
 	// 更新操作
 	public void update(ReadData sd) throws Exception {
-		String sql = "UPDATE t_readinfo SET fk_path='" + sd.getFk_path()
-				+ "',fontSize= " + sd.getFontSize() + ",fontStyle= "
-				+ sd.getFontStyle() + ",fontName= '" + sd.getFontName()
-				+ "',fontColor= '" + sd.getFontColor() + "',background= '"
-				+ sd.getBackground() + "',speed= " + sd.getSpeed();
+		String path = sd.getFk_path().replace("\\", "\\\\");
+		String sql = "UPDATE t_readinfo SET fk_path='" + path + "',fontSize= "
+				+ sd.getFontSize() + ",fontStyle= " + sd.getFontStyle()
+				+ ",fontName= '" + sd.getFontName() + "',fontColor= "
+				+ sd.getFontColor() + ",background= " + sd.getBackground()
+				+ ",speed= " + sd.getSpeed();
 		DbUtil.getInstance().updatasql(sql);
 	}
 

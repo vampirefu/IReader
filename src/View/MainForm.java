@@ -46,8 +46,8 @@ public class MainForm extends JFrame {
 		contentPane.setLayout(null);
 		MyUtils.SetFromShowCenter(MainForm.this);
 		rModel = new ReadModel();
-		//书籍管理按钮
-		JButton btn_Book = new JButton("\u4E66\u7C4D\u7BA1\u7406");
+		// 书籍管理按钮
+		JButton btn_Book = new JButton("书籍管理");
 		btn_Book.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				mainForm.setVisible(false);
@@ -57,7 +57,7 @@ public class MainForm extends JFrame {
 		});
 		btn_Book.setBounds(38, 23, 93, 23);
 		contentPane.add(btn_Book);
-		//阅读管理功能
+		// 阅读管理功能
 		JButton btn_Read = new JButton("\u9605\u8BFB\u7BA1\u7406");
 		btn_Read.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -68,7 +68,7 @@ public class MainForm extends JFrame {
 		});
 		btn_Read.setBounds(38, 74, 93, 23);
 		contentPane.add(btn_Read);
-		//设置按钮
+		// 设置按钮
 		JButton btn_Set = new JButton("\u8BBE\u7F6E");
 		btn_Set.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

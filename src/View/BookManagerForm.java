@@ -1,5 +1,6 @@
 package View;
 
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -16,6 +17,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import util.MyUtils;
 import Model.BookData;
+import Model.ReadData;
 import Model.ReadModel;
 
 public class BookManagerForm extends JFrame {
@@ -116,19 +118,20 @@ public class BookManagerForm extends JFrame {
 				if (MainForm.mainForm != null)
 					MainForm.mainForm.setVisible(false);
 				setVisible(false);
-				ReadForm rd = new ReadForm(rModel);
-				rd.setVisible(true);
 				DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree
 						.getLastSelectedPathComponent();
 				if (selectedNode == null)
 					return;
+				//获取节点对应的数据
 				for (BookData book : rModel.books) {
 					if (book.getBookName().trim() == selectedNode.toString()) {
 						// 设置当前阅读
 						rModel.curBook = book;
 						break;
 					}
-				}
+				}											
+				ReadForm rd = new ReadForm(rModel);
+				rd.setVisible(true);
 				if (rModel.curBook != null)
 					rd.OpenBook(rModel.curBook, BookManagerForm.this);
 			}

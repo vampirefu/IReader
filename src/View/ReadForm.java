@@ -80,18 +80,37 @@ public class ReadForm extends JFrame {
 		if (!rModel.setData.isCanEdit())
 			mui_Save.setVisible(false);
 		content.setLineWrap(rModel.setData.isAutoLineWrap());// 设置自动换行
-		if (rModel.curRead != null) {
-			content.setForeground(MyUtils.String2Color(rModel.curRead
-					.getFontColor()));
-			content.setBackground(MyUtils.String2Color(rModel.curRead
-					.getBackground()));
-		}
 		contentScroll = new JScrollPane(content);
 		// 滚动条
 		jsb = contentScroll.getVerticalScrollBar();
 		content.setBorder(BorderFactory.createBevelBorder(1));
 		JPanel upper = new JPanel(new BorderLayout());
 		upper.add(contentScroll);
+
+		if (rModel.curBook != null) {
+			try {
+				rModel.curRead = rModel.readDao
+						.select(rModel.curBook.getPath());
+			} catch (Exception e1) {
+				System.out.println("查询阅读数据失败");
+			}
+			if (rModel.curRead == null) {
+				Font font = content.getFont();
+				rModel.curRead = new ReadData(rModel.curBook.getPath(),
+						font.getSize(), font.getStyle(), font.getFontName(),
+						-16777216, -1, jsb.getUnitIncrement());
+				try {
+					rModel.readDao.insert(rModel.curRead);
+				} catch (Exception e) {
+					System.out.println("新增阅读数据失败");
+				}
+			}
+		}
+
+		if (rModel.curRead != null) {
+			content.setForeground(new Color(rModel.curRead.getFontColor()));
+			content.setBackground(new Color(rModel.curRead.getBackground()));
+		}
 
 		menu_file.add(mui_Open);
 		menu_file.add(mui_Save);
@@ -124,11 +143,12 @@ public class ReadForm extends JFrame {
 		this.setTitle("TXT小说阅读器");
 		this.setVisible(true);
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				super.windowClosing(e);
 				if (rModel.curBook != null) {
-					rModel.curBook.setLastSite(lastSite);
+					rModel.curBook.setLastSite(jsb.getValue());
 					try {
 						rModel.bookDao.update(rModel.curBook);
 					} catch (Exception e1) {
@@ -214,7 +234,7 @@ public class ReadForm extends JFrame {
 						File file = jfc.getSelectedFile();
 						if (file == null)
 							return;
-						fileName = file.getName();// 获得文件名
+						fileName = file.getName().replaceAll(".txt", "");// 获得文件名
 						str_filePath = file.getAbsolutePath();
 						// 打开TXT
 						if (str_filePath.contains(".txt")) {
@@ -246,8 +266,8 @@ public class ReadForm extends JFrame {
 						Font font = content.getFont();
 						rModel.curRead = new ReadData(str_filePath, font
 								.getSize(), font.getStyle(),
-								font.getFontName(), "(0,0,0)", "(255,255,255)",
-								jsb.getUnitIncrement());
+								font.getFontName(), -16777216, -1, jsb
+										.getUnitIncrement());
 						rModel.curBook = bd;
 						// 数据库同步
 						try {
@@ -307,7 +327,7 @@ public class ReadForm extends JFrame {
 				Color color = JColorChooser.showDialog(ReadForm.this, "选择颜色",
 						Color.BLACK);
 				content.setForeground(color);
-				rModel.curRead.setFontColor(color.toString());
+				rModel.curRead.setFontColor(color.getRGB());
 				try {
 					rModel.readDao.update(rModel.curRead);
 				} catch (Exception e1) {
@@ -322,7 +342,7 @@ public class ReadForm extends JFrame {
 				Color color = JColorChooser.showDialog(ReadForm.this, "选择颜色",
 						Color.WHITE);
 				content.setBackground(color);
-				rModel.curRead.setBackground(color.toString());
+				rModel.curRead.setBackground(color.getRGB());
 				try {
 					rModel.readDao.update(rModel.curRead);
 				} catch (Exception e1) {
@@ -372,6 +392,8 @@ public class ReadForm extends JFrame {
 		gbc_btn_Next.gridx = 4;
 		gbc_btn_Next.gridy = 0;
 		buttonp.add(btn_Next, gbc_btn_Next);
+
+		// 滚动条监听
 		jsb.addAdjustmentListener(new AdjustmentListener() {
 			public void adjustmentValueChanged(AdjustmentEvent e) {
 				if (jsb.getValue() == jsb.getMaximum())
@@ -400,18 +422,9 @@ public class ReadForm extends JFrame {
 			}
 			bufferedReader.close();
 			barMax = jsb.getValue();
-			// 滚动条置顶
-			content.setCaretPosition(0);
+			// 书签还原
+			content.setCaretPosition(book.getLastSite());
 			ReadForm.this.setTitle(book.getPath());
-			Font font = content.getFont();
-			rModel.curRead = new ReadData(book.getPath(), font.getSize(),
-					font.getStyle(), font.getFontName(), "(0,0,0)",
-					"(255,255,255)", jsb.getUnitIncrement());
-			try {
-				rModel.readDao.insert(rModel.curRead);
-			} catch (Exception e) {
-				System.out.println("新增阅读数据失败");
-			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e2) {
