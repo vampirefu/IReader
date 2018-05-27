@@ -31,7 +31,7 @@ public class AddBookForm extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public AddBookForm(final ReadModel rModel) {
+	public AddBookForm(final ReadModel rModel, final BookManagerForm bmf) {
 		this.setTitle("新增");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 322, 247);
@@ -71,17 +71,17 @@ public class AddBookForm extends JFrame {
 				} catch (Exception e1) {
 					System.out.println("新增书籍失败");
 				}
-
+				bmf.DataIni();
 				// 应用至树
-				if (book.getClassfy() == "最近阅读") {
-					DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(
-							book.getBookName());
-					BookManagerForm.node1.add(newNode);
-				} else if (book.getClassfy() == "历史阅读") {
-					DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(
-							book.getBookName());
-					BookManagerForm.node2.add(newNode);
-				}
+				// if (book.getClassfy() == "最近阅读") {
+				// DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(
+				// book.getBookName());
+				// BookManagerForm.node1.add(newNode);
+				// } else if (book.getClassfy() == "历史阅读") {
+				// DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(
+				// book.getBookName());
+				// BookManagerForm.node2.add(newNode);
+				// }
 				dispose();
 			}
 		});

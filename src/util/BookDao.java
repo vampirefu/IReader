@@ -34,7 +34,7 @@ public class BookDao {
 				+ sd.getLastSite()
 				+ ",'"
 				+ sd.getClassfy()
-				+ ","
+				+ "',"
 				+ sd.getLastRead() + ")";
 		DbUtil.getInstance().insertsql(sql);
 	}

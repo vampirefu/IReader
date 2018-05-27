@@ -1,6 +1,5 @@
 package View;
 
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -14,10 +13,10 @@ import javax.swing.JTree;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import util.MyUtils;
 import Model.BookData;
-import Model.ReadData;
 import Model.ReadModel;
 
 public class BookManagerForm extends JFrame {
@@ -26,6 +25,7 @@ public class BookManagerForm extends JFrame {
 
 	public static DefaultMutableTreeNode node1 = null;
 	public static DefaultMutableTreeNode node2 = null;
+	public static DefaultMutableTreeNode selectNode = null;
 	private ReadModel rModel = null;
 	private JTree tree;
 
@@ -60,7 +60,7 @@ public class BookManagerForm extends JFrame {
 		JButton btn_Add = new JButton("新增");
 		btn_Add.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				AddBookForm add = new AddBookForm(rModel);
+				AddBookForm add = new AddBookForm(rModel, BookManagerForm.this);
 				add.setVisible(true);
 			}
 		});
@@ -118,18 +118,18 @@ public class BookManagerForm extends JFrame {
 				if (MainForm.mainForm != null)
 					MainForm.mainForm.setVisible(false);
 				setVisible(false);
-				DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree
+				selectNode = (DefaultMutableTreeNode) tree
 						.getLastSelectedPathComponent();
-				if (selectedNode == null)
+				if (selectNode == null)
 					return;
-				//获取节点对应的数据
+				// 获取节点对应的数据
 				for (BookData book : rModel.books) {
-					if (book.getBookName().trim() == selectedNode.toString()) {
+					if (book.getBookName().trim() == selectNode.toString()) {
 						// 设置当前阅读
 						rModel.curBook = book;
 						break;
 					}
-				}											
+				}
 				ReadForm rd = new ReadForm(rModel);
 				rd.setVisible(true);
 				if (rModel.curBook != null)
@@ -142,6 +142,8 @@ public class BookManagerForm extends JFrame {
 		JButton btn_Back = new JButton("返回上一级");
 		btn_Back.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (MainForm.mainForm != null)
+					MainForm.mainForm.setVisible(true);
 				dispose();
 			}
 		});
@@ -158,7 +160,9 @@ public class BookManagerForm extends JFrame {
 		});
 	}
 
-	private void DataIni() {
+	public void DataIni() {
+		node1.removeAllChildren();
+		node2.removeAllChildren();
 		for (BookData book : rModel.books) {
 			if (book.getClassfy().contains("最近阅读")) {
 				DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(
@@ -170,6 +174,8 @@ public class BookManagerForm extends JFrame {
 				node2.add(newNode);
 			}
 		}
+		tree.expandPath(new TreePath(node1.getPath()));
+		tree.updateUI();
 	}
 
 }

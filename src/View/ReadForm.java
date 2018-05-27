@@ -162,11 +162,26 @@ public class ReadForm extends JFrame {
 							System.out.println("取消其他上次阅读");
 						}
 					}
+
 					if (rModel.setData.isContinueRead())
 						rModel.curBook.setLastRead(1);
-					if (rModel.setData.isAutoClassfy()
-							&& jsb.getValue() == jsb.getMaximum())
-						rModel.curBook.setClassfy("历史阅读");
+					if (rModel.setData.isAutoClassfy()) {
+						int record = jsb.getValue();
+						jsb.setValue(jsb.getMaximum());
+						if (jsb.getValue() == record) {
+							rModel.curBook.setClassfy("历史阅读");
+							if (BookManagerForm.selectNode.getParent()
+									.toString() == BookManagerForm.node1
+									.toString()) {
+								bForm.DataIni();
+							}
+
+						} else {
+							jsb.setValue(record);
+							System.out.println("还原滚动条位置");
+						}
+					}
+
 					try {
 						rModel.bookDao.update(rModel.curBook);
 					} catch (Exception e1) {
@@ -433,7 +448,6 @@ public class ReadForm extends JFrame {
 					content.setText(content.getText() + "\n" + str_line);
 				}
 			}
-
 			bufferedReader.close();
 			ReadForm.this.setTitle(book.getPath());
 			System.out.println(rModel.curBook.getLastSite());
