@@ -107,6 +107,11 @@ public class ReadForm extends JFrame {
 		if (rModel.curRead != null) {
 			content.setForeground(new Color(rModel.curRead.getFontColor()));
 			content.setBackground(new Color(rModel.curRead.getBackground()));
+			String wordName = rModel.curRead.getFontName();
+			int wordStyle = rModel.curRead.getFontStyle();
+			int wordSize = rModel.curRead.getFontSize();
+			content.setFont(new Font(wordName, wordStyle, wordSize));
+			jsb.setUnitIncrement(rModel.curRead.getSpeed());
 		}
 
 		menu_file.add(mui_Open);
